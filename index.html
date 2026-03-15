@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🦕 Dino Learning Hub</title>
+<style>
+/* ===== GOOGLE FONTS FALLBACK + SYSTEM ===== */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+:root {
+  --green: #3B6D11;
+  --green-light: #EAF3DE;
+  --green-mid: #639922;
+  --amber: #BA7517;
+  --amber-light: #FAEEDA;
+  --coral: #993C1D;
+  --coral-light: #FAECE7;
+  --purple: #534AB7;
+  --purple-light: #EEEDFE;
+  --teal: #0F6E56;
+  --teal-light: #E1F5EE;
+  --bg: #f7f9f4;
+  --card: #ffffff;
+  --border: #e4e8df;
+  --text: #1a2212;
+  --text-muted: #6b7c5a;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(59,109,17,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ===== HEADER ===== */
+.site-header {
+  background: linear-gradient(135deg, #2d5a0e 0%, #3B6D11 50%, #4a8a15 100%);
+  padding: 1.5rem 1rem 1rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.site-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.site-header h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  color: white;
+  letter-spacing: 2px;
+  position: relative;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.site-header p {
+  color: rgba(255,255,255,0.85);
+  font-size: clamp(13px, 2.5vw, 16px);
+  margin-top: 6px;
+  position: relative;
+  font-weight: 600;
+}
+.dino-strip {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 1.8rem;
+  position: relative;
+  opacity: 0.7;
+}
+
+/* ===== TABS ===== */
+.tabs-wrapper {
+  background: white;
+  border-bottom: 2px solid var(--border);
+  padding: 0.75rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.tab {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(13px, 2.5vw, 15px);
+  padding: 8px 18px;
+  border-radius: 30px;
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.tab:hover { transform: scale(1.05); }
+.tab.active { color: white; transform: scale(1.06); box-shadow: 0 3px 10px rgba(0,0,0,0.15); }
+.tab[data-cat="letters"].active { background: var(--purple); border-color: var(--purple); }
+.tab[data-cat="numbers"].active { background: var(--green); border-color: var(--green); }
+.tab[data-cat="puzzles"].active { background: var(--amber); border-color: var(--amber); }
+.tab[data-cat="art"].active { background: var(--coral); border-color: var(--coral); }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.generator-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.gen-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1.5px solid var(--border);
+}
+.gen-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.gen-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.25rem;
+}
+.gen-desc { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+  align-items: flex-end;
+}
+.control-group { display: flex; flex-direction: column; gap: 5px; }
+.control-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+select {
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  outline: none;
+}
+select:focus { border-color: var(--green); }
+
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.generate-btn {
+  font-family: 'Fredoka One', cursive;
+  font-size: 15px;
+  padding: 10px 22px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  color: white;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+.generate-btn:hover { transform: scale(1.04) translateY(-1px); box-shadow: 0 5px 14px rgba(0,0,0,0.2); }
+.generate-btn:active { transform: scale(0.97); }
+.letters-btn { background: linear-gradient(135deg, #534AB7, #7F77DD); }
+.numbers-btn { background: linear-gradient(135deg, #3B6D11, #639922); }
+.puzzles-btn { background: linear-gradient(135deg, #BA7517, #EF9F27); }
+.art-btn { background: linear-gradient(135deg, #993C1D, #D85A30); }
+
+.print-btn {
+  font-family: 'Fredoka One', cursive;
+  font-size: 14px;
+  padding: 10px 18px;
+  border-radius: 30px;
+  background: white;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+.print-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+/* ===== PREVIEW AREA ===== */
+.preview-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+.preview-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1.25rem;
+  min-height: 300px;
+  background: #fafafa;
+  transition: border-color 0.2s;
+}
+.preview-area.has-content {
+  background: white;
+  border-color: var(--green-mid);
+  border-style: solid;
+}
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  gap: 10px;
+  color: #ccc;
+}
+.placeholder .big-emoji { font-size: 3rem; opacity: 0.3; }
+.placeholder p { font-size: 14px; font-weight: 600; }
+
+/* ===== SHEET STYLES (visible in preview + print) ===== */
+.sheet { font-family: 'Nunito', sans-serif; }
+.sheet-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: var(--green);
+  text-align: center;
+  margin-bottom: 4px;
+}
+.sheet-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.trace-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 480px) { .trace-grid { grid-template-columns: repeat(2, 1fr); } }
+.trace-box {
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+  background: white;
+}
+.big-letter {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #e8e8e8;
+  font-family: 'Fredoka One', cursive;
+  line-height: 1;
+}
+.trace-line { border-bottom: 1.5px dashed #ccc; height: 34px; margin-top: 6px; }
+.math-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.math-box {
+  border: 1.5px solid #eee;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: white;
+}
+.math-q { font-size: 1.25rem; font-weight: 800; color: var(--green); }
+.ans-line { border-bottom: 1.5px solid #ddd; width: 48px; height: 26px; margin-top: 6px; }
+
+/* ===== FOOTER ===== */
+.site-footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1.5px solid var(--border);
+  background: white;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  body { background: white !important; }
+  .site-header, .tabs-wrapper, .controls, .btn-row,
+  .preview-label, .gen-header, .site-footer { display: none !important; }
+  .main { padding: 0; max-width: 100%; }
+  .generator-card { border: none; box-shadow: none; padding: 0; }
+  .preview-area { border: none; padding: 0; background: white; }
+  .sheet-title { color: #3B6D11 !important; }
+  .trace-box, .math-box { border-color: #ccc !important; }
+  .big-letter { color: #ddd !important; }
+  .trace-line, .ans-line { border-color: #bbb !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <h1>🦕 Dino Learning Hub</h1>
+  <p>Fun printable activities for curious young explorers!</p>
+  <div class="dino-strip">🦕 🦖 🦕 🦖 🦕</div>
+</header>
+
+<!-- TABS -->
+<div class="tabs-wrapper">
+  <div class="tabs">
+    <button class="tab active" data-cat="letters" onclick="switchTab('letters')">🔤 Letters</button>
+    <button class="tab" data-cat="numbers" onclick="switchTab('numbers')">🔢 Numbers</button>
+    <button class="tab" data-cat="puzzles" onclick="switchTab('puzzles')">🧩 Puzzles</button>
+    <button class="tab" data-cat="art" onclick="switchTab('art')">🎨 Art</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+  <div id="activity-area"></div>
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  Made with 💚 for a curious little dino explorer &nbsp;|&nbsp; Print any sheet using the 🖨 button
+</footer>
+
+<script>
+// =====================================================
+// DATA
+// =====================================================
+const DINOS = ['T-Rex','Raptor','Triceratops','Stegosaurus','Brachiosaurus',
+               'Pterodactyl','Ankylosaurus','Diplodocus','Spinosaurus','Iguanodon'];
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const DINO_WORDS = ['rex','egg','horn','tail','dino','claw','bone','nest','fang','roar','foot','skin','fire','herd'];
+const DINO_FACTS = [
+  'T-Rex had tiny arms but massive jaws!',
+  'Triceratops had 3 horns on its face.',
+  'Stegosaurus had plates on its back.',
+  'Brachiosaurus ate leaves from tall trees.',
+  'Pterodactyl could fly through the sky!',
+];
+
+let currentTab = 'letters';
+
+// =====================================================
+// TAB SWITCHING
+// =====================================================
+function switchTab(cat) {
+  currentTab = cat;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.cat === cat));
+  render();
+}
+
+function render() {
+  const area = document.getElementById('activity-area');
+  if (currentTab === 'letters') area.innerHTML = buildLettersUI();
+  else if (currentTab === 'numbers') area.innerHTML = buildNumbersUI();
+  else if (currentTab === 'puzzles') area.innerHTML = buildPuzzlesUI();
+  else area.innerHTML = buildArtUI();
+}
+
+function placeholder() {
+  return `<div class="placeholder"><div class="big-emoji">🦕</div><p>Click "Generate!" to create your sheet</p></div>`;
+}
+
+// =====================================================
+// LETTERS
+// =====================================================
+function buildLettersUI() {
+  return `<div class="generator-card">
+    <div class="gen-header">
+      <div class="gen-icon" style="background:#EEEDFE">🔤</div>
+      <div><div class="gen-title" style="color:#534AB7">Letters &amp; Reading</div>
+      <div class="gen-desc">Tracing, missing letters, matching &amp; more</div></div>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>Activity</label>
+        <select id="letter-type">
+          <option value="trace">Trace the letters</option>
+          <option value="missing">Fill the missing letter</option>
+          <option value="match">Letter &amp; dino match</option>
+          <option value="word">Spell the dino word</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Letter set</label>
+        <select id="letter-set">
+          <option value="random">Random 8</option>
+          <option value="af">A – F</option>
+          <option value="gm">G – M</option>
+          <option value="ns">N – S</option>
+          <option value="tz">T – Z</option>
+          <option value="vowels">Vowels (A E I O U)</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-bottom:1.25rem">
+      <button class="generate-btn letters-btn" onclick="generateLetters()">🦕 Generate!</button>
+      <button class="print-btn" onclick="printSheet('letters-preview')">🖨 Print / Save PDF</button>
+    </div>
+    <div class="preview-label">Preview</div>
+    <div class="preview-area" id="letters-preview">${placeholder()}</div>
+  </div>`;
+}
+
+function getLetterSet() {
+  const s = document.getElementById('letter-set').value;
+  if (s === 'af') return ALPHABET.slice(0,6);
+  if (s === 'gm') return ALPHABET.slice(6,13);
+  if (s === 'ns') return ALPHABET.slice(13,19);
+  if (s === 'tz') return ALPHABET.slice(19,26);
+  if (s === 'vowels') return ['A','E','I','O','U'];
+  return [...ALPHABET].sort(() => Math.random()-0.5).slice(0,8).sort();
+}
+
+function generateLetters() {
+  const type = document.getElementById('letter-type').value;
+  const letters = getLetterSet();
+  let html = '';
+
+  if (type === 'trace') {
+    const pairs = letters.map((l,i) => ({letter:l, dino:DINOS[i % DINOS.length]}));
+    html = `<div class="sheet-title">✏️ Trace the Letters!</div>
+    <div class="sheet-sub">Trace the grey letter, then practise writing it on the lines below</div>
+    <div class="trace-grid">` +
+    pairs.map(p => `<div class="trace-box">
+      <div class="big-letter">${p.letter}</div>
+      <div style="font-size:10px;color:#bbb;margin:3px 0">${p.dino.slice(0,8)}</div>
+      <div class="trace-line"></div>
+      <div class="trace-line"></div>
+    </div>`).join('') + `</div>
+    <div style="margin-top:14px;padding:10px 14px;background:#EAF3DE;border-radius:10px;font-size:13px;color:#3B6D11;font-weight:600">
+      🦕 Did you know? ${DINO_FACTS[Math.floor(Math.random()*DINO_FACTS.length)]}
+    </div>`;
+
+  } else if (type === 'missing') {
+    const words = [...DINO_WORDS].sort(() => Math.random()-0.5).slice(0,8);
+    html = `<div class="sheet-title">🔍 Missing Letters!</div>
+    <div class="sheet-sub">Write the missing letter in each dino word</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">` +
+    words.map(w => {
+      const hide = Math.floor(Math.random() * w.length);
+      const disp = w.toUpperCase().split('').map((c,i) =>
+        i===hide
+          ? `<span style="display:inline-block;border-bottom:2.5px solid #534AB7;width:22px;min-height:22px;">&nbsp;</span>`
+          : `<span style="font-weight:800;color:#222">${c}</span>`
+      ).join('<span style="display:inline-block;width:5px"></span>');
+      return `<div class="math-box">
+        <div style="font-size:1.15rem;letter-spacing:4px">${disp}</div>
+        <div style="font-size:11px;color:#bbb;margin-top:6px">_ _ _ _ _ _ _</div>
+      </div>`;
+    }).join('') + `</div>`;
+
+  } else if (type === 'match') {
+    const left = letters.slice(0,5);
+    const right = [...DINOS].filter(d => left.some(l => d.toUpperCase().startsWith(l)));
+    while(right.length < 5) right.push(DINOS[right.length]);
+    const shuffled = [...right].sort(() => Math.random()-0.5).slice(0,5);
+    html = `<div class="sheet-title">🔗 Match It!</div>
+    <div class="sheet-sub">Draw a line from each letter to the dino that starts with it</div>
+    <div style="display:flex;justify-content:space-between;gap:16px;margin-top:14px;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:16px;">` +
+      left.map(l => `<div style="width:42px;height:42px;border-radius:50%;background:#EEEDFE;border:2px solid #AFA9EC;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem;color:#534AB7">${l}</div>`).join('') +
+      `</div><div style="flex:1;border-left:2px dashed #e0e0e0;margin:0 8px"></div>
+      <div style="display:flex;flex-direction:column;gap:16px;text-align:right">` +
+      shuffled.map(d => `<div style="padding:8px 14px;background:#EAF3DE;border-radius:20px;font-size:13px;font-weight:700;color:#3B6D11;">${d}</div>`).join('') +
+      `</div></div>`;
+
+  } else {
+    // Spell the dino word
+    const words2 = [...DINO_WORDS].sort(() => Math.random()-0.5).slice(0,6);
+    html = `<div class="sheet-title">🦕 Spell the Dino Word!</div>
+    <div class="sheet-sub">Unjumble the letters to spell each word. Write your answer below!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">` +
+    words2.map(w => {
+      const jumbled = w.toUpperCase().split('').sort(() => Math.random()-0.5).join(' ');
+      return `<div class="math-box">
+        <div style="font-size:1.1rem;font-weight:800;color:#534AB7;letter-spacing:6px">${jumbled}</div>
+        <div style="font-size:11px;color:#bbb;margin-top:4px">${w.length} letters</div>
+        <div class="ans-line" style="width:100%;margin-top:8px"></div>
+      </div>`;
+    }).join('') + `</div>`;
+  }
+
+  const el = document.getElementById('letters-preview');
+  el.innerHTML = `<div class="sheet">${html}</div>`;
+  el.classList.add('has-content');
+}
+
+// =====================================================
+// NUMBERS
+// =====================================================
+function buildNumbersUI() {
+  return `<div class="generator-card">
+    <div class="gen-header">
+      <div class="gen-icon" style="background:#EAF3DE">🔢</div>
+      <div><div class="gen-title" style="color:#3B6D11">Numbers &amp; Maths</div>
+      <div class="gen-desc">Addition, counting, ordering, subtraction &amp; more</div></div>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>Activity</label>
+        <select id="num-type">
+          <option value="add">Dino addition</option>
+          <option value="sub">Subtraction</option>
+          <option value="count">Count the dinos</option>
+          <option value="order">Number ordering</option>
+          <option value="bonds">Number bonds</option>
+          <option value="bigger">Bigger or smaller?</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Max number</label>
+        <select id="num-max">
+          <option value="5">Up to 5</option>
+          <option value="10" selected>Up to 10</option>
+          <option value="20">Up to 20</option>
+          <option value="50">Up to 50</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Questions</label>
+        <select id="num-count">
+          <option value="6">6 questions</option>
+          <option value="8" selected>8 questions</option>
+          <option value="12">12 questions</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-bottom:1.25rem">
+      <button class="generate-btn numbers-btn" onclick="generateNumbers()">🦕 Generate!</button>
+      <button class="print-btn" onclick="printSheet('numbers-preview')">🖨 Print / Save PDF</button>
+    </div>
+    <div class="preview-label">Preview</div>
+    <div class="preview-area" id="numbers-preview">${placeholder()}</div>
+  </div>`;
+}
+
+function generateNumbers() {
+  const type = document.getElementById('num-type').value;
+  const max = parseInt(document.getElementById('num-max').value);
+  const count = parseInt(document.getElementById('num-count').value);
+  let html = '';
+
+  if (type === 'add') {
+    const half = Math.max(2, Math.floor(max/2));
+    const qs = Array.from({length:count}, () => {
+      const a = Math.floor(Math.random()*half)+1;
+      const b = Math.floor(Math.random()*Math.min(half, max-a))+1;
+      return {a, b};
+    });
+    html = `<div class="sheet-title">🦕 Dino Addition!</div>
+    <div class="sheet-sub">Add the numbers and write your answer. Count the dinos to help!</div>
+    <div class="math-grid">` +
+    qs.map(q => `<div class="math-box">
+      <div class="math-q">${q.a} + ${q.b} = ___</div>
+      <div style="font-size:1rem;margin-top:6px;letter-spacing:2px">${'🦕'.repeat(Math.min(q.a,5))} <span style="color:#ccc">+</span> ${'🦖'.repeat(Math.min(q.b,5))}</div>
+    </div>`).join('') + `</div>`;
+
+  } else if (type === 'sub') {
+    const qs = Array.from({length:count}, () => {
+      const b = Math.floor(Math.random()*(max-1))+1;
+      const a = Math.min(max, b + Math.floor(Math.random()*(max-b))+1);
+      return {a, b};
+    });
+    html = `<div class="sheet-title">🦖 Dino Subtraction!</div>
+    <div class="sheet-sub">Some dinos ran away! How many are left?</div>
+    <div class="math-grid">` +
+    qs.map(q => `<div class="math-box">
+      <div class="math-q">${q.a} − ${q.b} = ___</div>
+      <div style="font-size:11px;color:#aaa;margin-top:5px">${q.a} dinos, ${q.b} run away...</div>
+    </div>`).join('') + `</div>`;
+
+  } else if (type === 'count') {
+    const qs = Array.from({length:count}, () => Math.floor(Math.random()*max)+1);
+    const emojis = ['🦕','🦖','🥚','🦴','🌿'];
+    html = `<div class="sheet-title">🔢 Count the Dinos!</div>
+    <div class="sheet-sub">Count each group carefully and write the number in the box</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">` +
+    qs.map(n => {
+      const e = emojis[Math.floor(Math.random()*emojis.length)];
+      return `<div class="math-box" style="text-align:center">
+        <div style="font-size:1.3rem;line-height:1.8;min-height:52px;word-break:break-all">${e.repeat(n)}</div>
+        <div style="display:inline-block;border:2px solid #eee;border-radius:8px;width:44px;height:34px;margin-top:8px"></div>
+      </div>`;
+    }).join('') + `</div>`;
+
+  } else if (type === 'order') {
+    const rows = Array.from({length:Math.min(count,5)}, () => {
+      const set = new Set();
+      while(set.size < 5) set.add(Math.floor(Math.random()*max)+1);
+      return [...set].sort(() => Math.random()-0.5);
+    });
+    html = `<div class="sheet-title">🦕 Number Order!</div>
+    <div class="sheet-sub">Write the numbers smallest → biggest in the boxes</div>
+    <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px">` +
+    rows.map(r => `<div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+        ${r.map(n=>`<div style="min-width:36px;height:36px;border-radius:8px;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-weight:800;color:#3B6D11;font-size:1rem;padding:0 6px">${n}</div>`).join('')}
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="font-size:11px;color:#aaa;margin-right:4px">Answer:</span>
+        ${r.map(()=>`<div style="min-width:36px;height:36px;border-radius:8px;border:1.5px solid #ddd"></div>`).join('')}
+      </div>
+    </div>`).join('') + `</div>`;
+
+  } else if (type === 'bonds') {
+    const target = Math.min(max, 10);
+    const qs = Array.from({length:count}, () => {
+      const a = Math.floor(Math.random()*(target+1));
+      return {a, b:target-a, target};
+    });
+    html = `<div class="sheet-title">💚 Number Bonds to ${target}!</div>
+    <div class="sheet-sub">Fill in the missing number so each pair adds up to ${target}</div>
+    <div class="math-grid">` +
+    qs.map(q => `<div class="math-box">
+      <div class="math-q">${q.a} + ___ = ${q.target}</div>
+    </div>`).join('') + `</div>`;
+
+  } else {
+    // bigger or smaller
+    const qs = Array.from({length:count}, () => {
+      const a = Math.floor(Math.random()*max)+1;
+      let b = Math.floor(Math.random()*max)+1;
+      while(b === a) b = Math.floor(Math.random()*max)+1;
+      return {a, b};
+    });
+    html = `<div class="sheet-title">🦖 Bigger or Smaller?</div>
+    <div class="sheet-sub">Write &gt; (bigger) or &lt; (smaller) in the middle box</div>
+    <div class="math-grid">` +
+    qs.map(q => `<div class="math-box" style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:1.3rem;font-weight:800;color:#3B6D11;min-width:28px;text-align:center">${q.a}</div>
+      <div style="width:32px;height:32px;border:2px solid #ddd;border-radius:8px"></div>
+      <div style="font-size:1.3rem;font-weight:800;color:#3B6D11;min-width:28px;text-align:center">${q.b}</div>
+    </div>`).join('') + `</div>`;
+  }
+
+  const el = document.getElementById('numbers-preview');
+  el.innerHTML = `<div class="sheet">${html}</div>`;
+  el.classList.add('has-content');
+}
+
+// =====================================================
+// PUZZLES
+// =====================================================
+function buildPuzzlesUI() {
+  return `<div class="generator-card">
+    <div class="gen-header">
+      <div class="gen-icon" style="background:#FAEEDA">🧩</div>
+      <div><div class="gen-title" style="color:#BA7517">Puzzles &amp; Logic</div>
+      <div class="gen-desc">Word searches, patterns, odd one out &amp; mazes</div></div>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>Puzzle type</label>
+        <select id="puzzle-type">
+          <option value="wordsearch">Dino word search</option>
+          <option value="odd">Odd one out</option>
+          <option value="pattern">Complete the pattern</option>
+          <option value="maze">Dino maze</option>
+          <option value="shadow">Match the shadow</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-bottom:1.25rem">
+      <button class="generate-btn puzzles-btn" onclick="generatePuzzles()">🦕 Generate!</button>
+      <button class="print-btn" onclick="printSheet('puzzles-preview')">🖨 Print / Save PDF</button>
+    </div>
+    <div class="preview-label">Preview</div>
+    <div class="preview-area" id="puzzles-preview">${placeholder()}</div>
+  </div>`;
+}
+
+function generatePuzzles() {
+  const type = document.getElementById('puzzle-type').value;
+  let html = '';
+
+  if (type === 'wordsearch') {
+    html = buildWordSearch();
+  } else if (type === 'odd') {
+    html = buildOddOneOut();
+  } else if (type === 'pattern') {
+    html = buildPattern();
+  } else if (type === 'maze') {
+    html = buildMaze();
+  } else {
+    html = buildShadowMatch();
+  }
+
+  const el = document.getElementById('puzzles-preview');
+  el.innerHTML = `<div class="sheet">${html}</div>`;
+  el.classList.add('has-content');
+}
+
+function buildWordSearch() {
+  const words = [...DINO_WORDS].sort(() => Math.random()-0.5).slice(0,5);
+  const size = 8;
+  const grid = Array.from({length:size}, () => Array(size).fill(''));
+  words.forEach(w => {
+    const wUp = w.toUpperCase();
+    for(let t=0;t<60;t++){
+      const horiz = Math.random()>0.5;
+      const row = Math.floor(Math.random()*(horiz ? size : size-wUp.length));
+      const col = Math.floor(Math.random()*(horiz ? size-wUp.length : size));
+      let ok = true;
+      for(let i=0;i<wUp.length&&ok;i++){
+        const r2=horiz?row:row+i, c2=horiz?col+i:col;
+        if(grid[r2][c2] && grid[r2][c2]!==wUp[i]) ok=false;
+      }
+      if(ok){
+        for(let i=0;i<wUp.length;i++){
+          const r2=horiz?row:row+i, c2=horiz?col+i:col;
+          grid[r2][c2]=wUp[i];
+        }
+        break;
+      }
+    }
+  });
+  const letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(let r=0;r<size;r++) for(let c=0;c<size;c++) if(!grid[r][c]) grid[r][c]=letters[Math.floor(Math.random()*26)];
+
+  return `<div class="sheet-title">🔍 Dino Word Search!</div>
+  <div class="sheet-sub">Find these words: <strong>${words.map(w=>w.toUpperCase()).join(', ')}</strong></div>
+  <div style="display:inline-block;border:2px solid #eee;border-radius:10px;overflow:hidden;margin:10px 0">` +
+  grid.map(row=>`<div style="display:flex">`+
+    row.map(c=>`<div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#333;border:0.5px solid #f2f2f2">${c}</div>`).join('')
+  +`</div>`).join('') + `</div>
+  <div style="margin-top:10px;font-size:12px;color:#aaa">Words can be across ➡️ or down ⬇️</div>`;
+}
+
+function buildOddOneOut() {
+  const groups = [
+    {label:'Group 1', items:['T-Rex 🦖','Raptor 🦖','Dog 🐕','Stegosaurus 🦕'], odd:2, reason:'not a dinosaur'},
+    {label:'Group 2', items:['1','2','3','Egg 🥚'], odd:3, reason:'not a number'},
+    {label:'Group 3', items:['Red ❤️','Blue 💙','Happy 😊','Green 💚'], odd:2, reason:'not a colour'},
+    {label:'Group 4', items:['Apple 🍎','Banana 🍌','Carrot 🥕','T-Rex 🦖'], odd:3, reason:'not food'},
+    {label:'Group 5', items:['Cat 🐈','Dog 🐕','Fish 🐟','Fossil 🦴'], odd:3, reason:'not an animal'},
+  ].sort(() => Math.random()-0.5).slice(0,4);
+
+  return `<div class="sheet-title">🤔 Odd One Out!</div>
+  <div class="sheet-sub">Circle the one that does NOT belong in each group</div>
+  <div style="display:flex;flex-direction:column;gap:14px;margin-top:10px">` +
+  groups.map(g=>`<div>
+    <div style="font-size:12px;font-weight:700;color:#BA7517;margin-bottom:6px">${g.label}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">` +
+    g.items.map((it,ii)=>`<div style="border:1.5px solid #eee;border-radius:10px;padding:7px 14px;font-size:13px;font-weight:600;color:#333;background:white">${it}</div>`).join('') +
+    `</div></div>`).join('') + `</div>`;
+}
+
+function buildPattern() {
+  const seqs = [
+    {items:['🦕','🦖','🦕','🦖','🦕','?'], label:'What comes next?'},
+    {items:['2','4','6','8','?',''], label:'Count in 2s'},
+    {items:['🔴','🔵','🟡','🔴','🔵','?'], label:'Colour pattern'},
+    {items:['1','2','3','4','5','?'], label:'Count on!'},
+    {items:['🦕','🦕','🦖','🦕','🦕','?'], label:'Look carefully!'},
+    {items:['10','9','8','7','?',''], label:'Count backwards'},
+  ];
+  const chosen = seqs.sort(()=>Math.random()-0.5).slice(0,4);
+  return `<div class="sheet-title">🎯 Complete the Pattern!</div>
+  <div class="sheet-sub">What comes next in each sequence? Write or draw your answer in the ? box</div>
+  <div style="display:flex;flex-direction:column;gap:16px;margin-top:10px">` +
+  chosen.map(s=>`<div>
+    <div style="font-size:11px;font-weight:700;color:#BA7517;margin-bottom:6px">${s.label}</div>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">` +
+    s.items.filter(x=>x).map((it) =>
+      it === '?'
+        ? `<div style="min-width:44px;height:44px;border:2.5px dashed #BA7517;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:#BA7517">?</div>`
+        : `<div style="min-width:44px;height:44px;border:1.5px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#333;padding:0 6px">${it}</div>`
+    ).join('') + `</div></div>`).join('') + `</div>`;
+}
+
+function buildMaze() {
+  const mazeData = [
+    "S.XXXXX",
+    "..X...X",
+    "X.X.X.X",
+    "X...X..",
+    "XXXXX.X",
+    "X.....X",
+    "X.XXXXX",
+    "X.....E"
+  ];
+  const rows=mazeData.length, cols=mazeData[0].length;
+  const cs=38;
+  let svg=`<svg viewBox="0 0 ${cols*cs+20} ${rows*cs+24}" width="100%" style="display:block;max-width:320px;margin:0 auto">`;
+  svg+=`<rect x="10" y="10" width="${cols*cs}" height="${rows*cs}" fill="#f9fdf4" stroke="#c8ddb0" stroke-width="1.5" rx="6"/>`;
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const ch=mazeData[r][c];
+      const x=10+c*cs, y=10+r*cs;
+      if(ch==='X') svg+=`<rect x="${x+1}" y="${y+1}" width="${cs-2}" height="${cs-2}" fill="#8fbc5a" rx="3"/>`;
+      else if(ch==='S') svg+=`<text x="${x+cs/2}" y="${y+cs/2+6}" text-anchor="middle" font-size="20">🦖</text>`;
+      else if(ch==='E') svg+=`<text x="${x+cs/2}" y="${y+cs/2+6}" text-anchor="middle" font-size="20">🥚</text>`;
+      svg+=`<rect x="${x}" y="${y}" width="${cs}" height="${cs}" fill="none" stroke="#e0ecd0" stroke-width="0.5"/>`;
+    }
+  }
+  svg+=`</svg>`;
+  return `<div class="sheet-title">🌿 Help the Dino Find the Egg!</div>
+  <div class="sheet-sub">Draw the path through the maze. Avoid the green walls!</div>
+  <div style="margin-top:8px">${svg}</div>
+  <div style="display:flex;gap:12px;margin-top:10px;font-size:12px;color:#888">
+    <span>🦖 = Start</span><span>🥚 = Finish</span><span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;height:14px;background:#8fbc5a;border-radius:3px"></span>= Wall</span>
+  </div>`;
+}
+
+function buildShadowMatch() {
+  const shapes = [
+    {name:'T-Rex', emoji:'🦖'},
+    {name:'Egg', emoji:'🥚'},
+    {name:'Bone', emoji:'🦴'},
+    {name:'Leaf', emoji:'🌿'},
+    {name:'Footprint', emoji:'👣'},
+    {name:'Star', emoji:'⭐'},
+  ];
+  const pairs = [...shapes].sort(()=>Math.random()-0.5).slice(0,4);
+  const shuffledRight = [...pairs].sort(()=>Math.random()-0.5);
+  return `<div class="sheet-title">🌑 Match the Shadow!</div>
+  <div class="sheet-sub">Draw a line from each picture on the left to its matching shadow on the right</div>
+  <div style="display:flex;justify-content:space-between;gap:16px;margin-top:14px">
+    <div style="display:flex;flex-direction:column;gap:14px">` +
+    pairs.map(p=>`<div style="display:flex;align-items:center;gap:8px">
+      <div style="width:48px;height:48px;border:1.5px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.6rem">${p.emoji}</div>
+      <div style="font-size:12px;font-weight:600;color:#888">${p.name}</div>
+    </div>`).join('') +
+    `</div><div style="border-left:2px dashed #e0e0e0;margin:0 4px"></div>
+    <div style="display:flex;flex-direction:column;gap:14px">` +
+    shuffledRight.map(p=>`<div style="display:flex;align-items:center;gap:8px">
+      <div style="width:48px;height:48px;border:1.5px solid #eee;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;filter:brightness(0) opacity(0.2)">${p.emoji}</div>
+      <div style="font-size:12px;font-weight:600;color:#bbb">${p.name}</div>
+    </div>`).join('') + `</div></div>`;
+}
+
+// =====================================================
+// ART
+// =====================================================
+function buildArtUI() {
+  return `<div class="generator-card">
+    <div class="gen-header">
+      <div class="gen-icon" style="background:#FAECE7">🎨</div>
+      <div><div class="gen-title" style="color:#993C1D">Creative Art</div>
+      <div class="gen-desc">Drawing, colouring, dot grids &amp; more</div></div>
+    </div>
+    <div class="controls">
+      <div class="control-group">
+        <label>Activity</label>
+        <select id="art-type">
+          <option value="colour">Colour by number</option>
+          <option value="draw">Draw your own dino</option>
+          <option value="dotgrid">Dot grid drawing</option>
+          <option value="egg">Decorate the eggs</option>
+          <option value="scene">Draw a dino scene</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-bottom:1.25rem">
+      <button class="generate-btn art-btn" onclick="generateArt()">🦕 Generate!</button>
+      <button class="print-btn" onclick="printSheet('art-preview')">🖨 Print / Save PDF</button>
+    </div>
+    <div class="preview-label">Preview</div>
+    <div class="preview-area" id="art-preview">${placeholder()}</div>
+  </div>`;
+}
+
+function generateArt() {
+  const type = document.getElementById('art-type').value;
+  let html = '';
+
+  if (type === 'colour') {
+    html = buildColourByNumber();
+  } else if (type === 'draw') {
+    html = buildDrawDino();
+  } else if (type === 'dotgrid') {
+    html = buildDotGrid();
+  } else if (type === 'egg') {
+    html = buildDecorateEggs();
+  } else {
+    html = buildDinoScene();
+  }
+
+  const el = document.getElementById('art-preview');
+  el.innerHTML = `<div class="sheet">${html}</div>`;
+  el.classList.add('has-content');
+}
+
+function buildColourByNumber() {
+  const key = [
+    {n:1,col:'#f9c74f',name:'Yellow'},
+    {n:2,col:'#90be6d',name:'Green'},
+    {n:3,col:'#f94144',name:'Red'},
+    {n:4,col:'#4895ef',name:'Blue'},
+    {n:5,col:'#f3722c',name:'Orange'},
+  ];
+  return `<div class="sheet-title">🎨 Colour by Number!</div>
+  <div class="sheet-sub">Use the colour guide to fill in the dinosaur</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 12px;justify-content:center">` +
+  key.map(k=>`<div style="display:flex;align-items:center;gap:5px"><div style="width:20px;height:20px;background:${k.col};border-radius:4px;border:1px solid #ddd"></div><span style="font-size:13px;font-weight:700;color:#555">${k.n} = ${k.name}</span></div>`).join('') + `</div>
+  <svg viewBox="0 0 280 200" width="100%" style="display:block;max-width:320px;margin:0 auto">
+    <!-- Body -->
+    <ellipse cx="140" cy="130" rx="80" ry="55" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="140" y="136" text-anchor="middle" font-size="14" font-weight="700" fill="#999">2</text>
+    <!-- Head -->
+    <ellipse cx="68" cy="85" rx="34" ry="28" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="68" y="91" text-anchor="middle" font-size="14" font-weight="700" fill="#999">1</text>
+    <!-- neck connector -->
+    <line x1="95" y1="93" x2="108" y2="104" stroke="#bbb" stroke-width="1.5"/>
+    <!-- Tail -->
+    <ellipse cx="215" cy="140" rx="28" ry="16" fill="white" stroke="#bbb" stroke-width="1.5" transform="rotate(-20,215,140)"/>
+    <text x="215" y="144" text-anchor="middle" font-size="12" font-weight="700" fill="#999">3</text>
+    <!-- Back spikes -->
+    <polygon points="115,78 122,60 129,78" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="122" y="76" text-anchor="middle" font-size="9" font-weight="700" fill="#999">5</text>
+    <polygon points="133,76 140,56 147,76" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="140" y="74" text-anchor="middle" font-size="9" font-weight="700" fill="#999">5</text>
+    <polygon points="151,78 158,62 165,78" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="158" y="76" text-anchor="middle" font-size="9" font-weight="700" fill="#999">5</text>
+    <!-- Legs -->
+    <ellipse cx="100" cy="178" rx="16" ry="10" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="100" y="182" text-anchor="middle" font-size="10" font-weight="700" fill="#999">4</text>
+    <ellipse cx="134" cy="180" rx="16" ry="10" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="134" y="184" text-anchor="middle" font-size="10" font-weight="700" fill="#999">4</text>
+    <ellipse cx="168" cy="178" rx="16" ry="10" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="168" y="182" text-anchor="middle" font-size="10" font-weight="700" fill="#999">4</text>
+    <!-- Eye -->
+    <circle cx="58" cy="80" r="5" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="58" y="84" text-anchor="middle" font-size="8" font-weight="700" fill="#999">1</text>
+    <!-- Teeth -->
+    <polygon points="50,96 56,106 62,96" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="56" y="104" text-anchor="middle" font-size="8" font-weight="700" fill="#999">3</text>
+    <polygon points="62,96 68,108 74,96" fill="white" stroke="#bbb" stroke-width="1.5"/>
+    <text x="68" y="106" text-anchor="middle" font-size="8" font-weight="700" fill="#999">3</text>
+  </svg>`;
+}
+
+function buildDrawDino() {
+  const dinos = ['T-Rex','Triceratops','Stegosaurus','Brachiosaurus'];
+  const chosen = dinos[Math.floor(Math.random()*dinos.length)];
+  const steps = {
+    'T-Rex':['Draw a big oval body','Add a large round head','Draw a long thick tail','Add two short arms','Draw two strong legs','Add teeth, claws and an eye!','Colour it in!'],
+    'Triceratops':['Draw a big round body','Add a wide flat head','Draw 3 horns on the head (1 small, 2 big)','Add a fan-shaped frill behind the head','Draw 4 stubby legs','Add a short tail','Colour it in!'],
+    'Stegosaurus':['Draw an oval body','Add a small head on a short neck','Draw a short thick tail','Add 4 legs','Draw large triangular plates along the back','Add some spikes on the tail','Colour it in!'],
+    'Brachiosaurus':['Draw a round body','Add a VERY long neck going up','Draw a tiny head at the top','Add a medium-length tail','Draw 4 sturdy pillar-like legs','Add spots or patterns','Colour it in!'],
+  };
+  return `<div class="sheet-title">✏️ Draw a ${chosen}!</div>
+  <div class="sheet-sub">Follow the steps to draw your own dino, then colour it in!</div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px">
+    <div style="flex:1;min-width:150px">
+      <div style="font-size:12px;font-weight:700;color:#993C1D;margin-bottom:8px">Step by step guide:</div>
+      ${steps[chosen].map((s,i)=>`<div style="display:flex;gap:7px;align-items:flex-start;margin-bottom:6px">
+        <div style="min-width:22px;height:22px;border-radius:50%;background:#FAECE7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#993C1D;flex-shrink:0">${i+1}</div>
+        <div style="font-size:12px;color:#555;padding-top:3px">${s}</div>
+      </div>`).join('')}
+    </div>
+    <div style="flex:1;min-width:180px;border:2px dashed #ddd;border-radius:14px;min-height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:#fefefe">
+      <div style="font-size:3rem;opacity:0.07">🦕</div>
+      <div style="font-size:12px;color:#ccc;font-weight:600">Draw your ${chosen} here!</div>
+    </div>
+  </div>`;
+}
+
+function buildDotGrid() {
+  const cols=12, rows=10, sp=22;
+  let dotSvg=`<svg viewBox="0 0 ${cols*sp+20} ${rows*sp+20}" width="100%" style="display:block;max-width:320px;margin:0 auto">`;
+  for(let r=0;r<rows;r++) for(let c=0;c<cols;c++)
+    dotSvg+=`<circle cx="${10+c*sp+sp/2}" cy="${10+r*sp+sp/2}" r="2.5" fill="#ddd"/>`;
+  dotSvg+=`</svg>`;
+  const ideas = ['a volcano','a jungle','a flying pterodactyl','a dino eating leaves','a dino nest with eggs','your favourite dinosaur'];
+  const idea = ideas[Math.floor(Math.random()*ideas.length)];
+  return `<div class="sheet-title">🦕 Dot Grid Drawing!</div>
+  <div class="sheet-sub">Connect the dots to make your own picture! Try drawing: <strong>${idea}</strong></div>
+  ${dotSvg}
+  <div style="margin-top:10px;padding:8px 12px;background:#EAF3DE;border-radius:10px;font-size:12px;color:#3B6D11;font-weight:600;text-align:center">
+    Tip: Start simple — draw straight lines between dots, then add details!
+  </div>`;
+}
+
+function buildDecorateEggs() {
+  const fills = ['#ffecd2','#d5f5e3','#fde8ff','#dff0ff','#fff3cc','#ffe4e1','#e8f4f8','#fef9e7'];
+  return `<div class="sheet-title">🥚 Decorate the Dino Eggs!</div>
+  <div class="sheet-sub">Draw patterns, spots, stripes and swirls on each egg — make them unique!</div>
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px">` +
+  Array.from({length:6},(_,i)=>`<svg viewBox="0 0 70 90" width="90" style="display:block">
+    <ellipse cx="35" cy="48" rx="26" ry="36" fill="${fills[i % fills.length]}" stroke="#ccc" stroke-width="1.5"/>
+  </svg>`).join('') + `</div>
+  <div style="margin-top:12px;font-size:12px;color:#aaa;text-align:center">
+    Ideas: dots • stripes • zigzags • flowers • hearts • scales
+  </div>`;
+}
+
+function buildDinoScene() {
+  return `<div class="sheet-title">🌋 Draw a Dino Scene!</div>
+  <div class="sheet-sub">Draw your favourite dinosaurs in this prehistoric world!</div>
+  <svg viewBox="0 0 340 200" width="100%" style="display:block;max-width:380px;margin:8px auto">
+    <!-- Sky -->
+    <rect x="0" y="0" width="340" height="130" fill="#e8f4fd" stroke="none" rx="8"/>
+    <!-- Ground -->
+    <rect x="0" y="130" width="340" height="70" fill="#c8deb0" stroke="none"/>
+    <!-- Ground line -->
+    <line x1="0" y1="130" x2="340" y2="130" stroke="#a0c070" stroke-width="2"/>
+    <!-- Volcano silhouette -->
+    <polygon points="280,130 310,50 340,130" fill="#c0bdb5" stroke="none"/>
+    <polygon points="305,52 310,44 316,54" fill="#f4a261" stroke="none"/>
+    <!-- Trees/ferns -->
+    <line x1="40" y1="130" x2="40" y2="100" stroke="#6b8c42" stroke-width="2"/>
+    <ellipse cx="40" cy="94" rx="16" ry="12" fill="#7db53a" stroke="none"/>
+    <line x1="70" y1="130" x2="70" y2="108" stroke="#6b8c42" stroke-width="2"/>
+    <ellipse cx="70" cy="102" rx="12" ry="10" fill="#90c040" stroke="none"/>
+    <line x1="240" y1="130" x2="240" y2="96" stroke="#6b8c42" stroke-width="2"/>
+    <ellipse cx="240" cy="90" rx="18" ry="14" fill="#7db53a" stroke="none"/>
+    <!-- Clouds -->
+    <ellipse cx="100" cy="30" rx="28" ry="14" fill="white" stroke="none"/>
+    <ellipse cx="118" cy="24" rx="18" ry="12" fill="white" stroke="none"/>
+    <ellipse cx="82" cy="26" rx="16" ry="11" fill="white" stroke="none"/>
+    <ellipse cx="220" cy="45" rx="22" ry="11" fill="white" stroke="none"/>
+    <ellipse cx="236" cy="40" rx="14" ry="9" fill="white" stroke="none"/>
+    <!-- Drawing area hint -->
+    <text x="170" y="160" text-anchor="middle" font-size="11" fill="#aaa" font-family="Nunito,sans-serif">Draw your dinos here!</text>
+    <!-- Border -->
+    <rect x="1" y="1" width="338" height="198" fill="none" stroke="#ddd" stroke-width="1.5" rx="8"/>
+  </svg>
+  <div style="margin-top:8px;font-size:12px;color:#aaa;text-align:center">
+    Ideas: T-Rex • Triceratops • flying Pterodactyl • volcanoes • dinosaur nests
+  </div>`;
+}
+
+// =====================================================
+// PRINT
+// =====================================================
+function printSheet(previewId) {
+  const preview = document.getElementById(previewId);
+  if (!preview || !preview.classList.contains('has-content')) {
+    alert('Please click "Generate!" first to create your activity sheet!');
+    return;
+  }
+  const content = preview.innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dino Activity Sheet</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+:root{--green:#3B6D11;--amber:#BA7517;--coral:#993C1D;--purple:#534AB7;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito','Segoe UI',sans-serif;padding:24px 28px;max-width:680px;margin:0 auto;background:white;color:#1a2212}
+.sheet-title{font-family:'Fredoka One',cursive;font-size:1.6rem;color:#3B6D11;text-align:center;margin-bottom:4px}
+.sheet-sub{font-size:13px;color:#888;text-align:center;margin-bottom:1rem}
+.trace-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.trace-box{border:1.5px solid #ddd;border-radius:10px;padding:10px 8px;text-align:center}
+.big-letter{font-size:2.8rem;font-weight:800;color:#e8e8e8;font-family:'Fredoka One',cursive;line-height:1}
+.trace-line{border-bottom:1.5px dashed #ccc;height:34px;margin-top:6px}
+.math-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.math-box{border:1.5px solid #eee;border-radius:10px;padding:10px 14px}
+.math-q{font-size:1.2rem;font-weight:800;color:#3B6D11}
+.ans-line{border-bottom:1.5px solid #ddd;width:48px;height:26px;margin-top:6px}
+.placeholder{display:none}
+@media print{
+  body{padding:10px}
+  @page{margin:10mm;size:A4}
+}
+</style>
+</head>
+<body>${content}</body>
+</html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(() => { w.print(); }, 700);
+}
+
+// =====================================================
+// INIT
+// =====================================================
+render();
+</script>
+</body>
+</html>
