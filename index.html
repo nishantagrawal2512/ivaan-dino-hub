@@ -515,27 +515,55 @@ function buildNumbersUI() {
     <div class="gen-header">
       <div class="gen-icon" style="background:#EAF3DE">🔢</div>
       <div><div class="gen-title" style="color:#3B6D11">Numbers &amp; Maths</div>
-      <div class="gen-desc">Addition, counting, ordering, subtraction &amp; more</div></div>
+      <div class="gen-desc">Every sheet is freshly randomised — hit Generate again for a brand new set!</div></div>
     </div>
     <div class="controls">
       <div class="control-group">
         <label>Activity</label>
         <select id="num-type">
-          <option value="add">Dino addition</option>
-          <option value="sub">Subtraction</option>
-          <option value="count">Count the dinos</option>
-          <option value="order">Number ordering</option>
-          <option value="bonds">Number bonds</option>
-          <option value="bigger">Bigger or smaller?</option>
+          <optgroup label="➕ Addition">
+            <option value="add">Addition (random questions)</option>
+            <option value="add_missing">Addition — missing number</option>
+          </optgroup>
+          <optgroup label="➖ Subtraction">
+            <option value="sub">Subtraction (random questions)</option>
+            <option value="sub_missing">Subtraction — missing number</option>
+          </optgroup>
+          <optgroup label="✖️ Multiplication">
+            <option value="times_single">Times tables — single table</option>
+            <option value="times_mixed">Times tables — mixed tables</option>
+            <option value="times_grid">Times table grid</option>
+          </optgroup>
+          <optgroup label="🎲 Mixed">
+            <option value="mixed_add_sub">Mixed addition &amp; subtraction</option>
+            <option value="mixed_all">Mixed add, subtract &amp; multiply</option>
+          </optgroup>
+          <optgroup label="🔢 Other">
+            <option value="count">Count the dinos</option>
+            <option value="order">Number ordering</option>
+            <option value="bonds">Number bonds</option>
+            <option value="bigger">Bigger or smaller?</option>
+          </optgroup>
         </select>
       </div>
-      <div class="control-group">
+      <div class="control-group" id="num-max-group">
         <label>Max number</label>
         <select id="num-max">
           <option value="5">Up to 5</option>
           <option value="10" selected>Up to 10</option>
           <option value="20">Up to 20</option>
           <option value="50">Up to 50</option>
+          <option value="100">Up to 100</option>
+        </select>
+      </div>
+      <div class="control-group" id="times-table-group" style="display:none">
+        <label>Which table?</label>
+        <select id="times-table">
+          <option value="2">2 times table</option>
+          <option value="3">3 times table</option>
+          <option value="4">4 times table</option>
+          <option value="5">5 times table</option>
+          <option value="6">6 times table</option>
         </select>
       </div>
       <div class="control-group">
@@ -544,11 +572,16 @@ function buildNumbersUI() {
           <option value="6">6 questions</option>
           <option value="8" selected>8 questions</option>
           <option value="12">12 questions</option>
+          <option value="16">16 questions</option>
         </select>
       </div>
     </div>
+    <div style="margin-bottom:1rem;padding:8px 12px;background:#EAF3DE;border-radius:10px;font-size:12px;color:#3B6D11;font-weight:600">
+      🎲 Every time you click Generate you get a completely new random set of questions!
+    </div>
     <div class="btn-row" style="margin-bottom:1.25rem">
       <button class="generate-btn numbers-btn" onclick="generateNumbers()">🦕 Generate!</button>
+      <button class="generate-btn numbers-btn" onclick="generateNumbers()" style="background:linear-gradient(135deg,#0F6E56,#1D9E75);font-size:13px;padding:10px 16px">🔄 New Set</button>
       <button class="print-btn" onclick="printSheet('numbers-preview')">🖨 Print / Save PDF</button>
     </div>
     <div class="preview-label">Preview</div>
@@ -556,102 +589,300 @@ function buildNumbersUI() {
   </div>`;
 }
 
+// Show/hide controls based on activity type
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.id === 'num-type') {
+    const v = e.target.value;
+    const isTimes = v === 'times_single';
+    const isGrid = v === 'times_grid';
+    const showMax = !isGrid && !isTimes && v !== 'times_mixed';
+    const tg = document.getElementById('times-table-group');
+    const mg = document.getElementById('num-max-group');
+    if (tg) tg.style.display = (isTimes || isGrid) ? 'flex' : 'none';
+    if (mg) mg.style.display = showMax ? 'flex' : 'none';
+  }
+});
+
+// Utility: deduplicated random questions
+function uniqueQs(count, genFn) {
+  const seen = new Set();
+  const qs = [];
+  let tries = 0;
+  while (qs.length < count && tries < count * 30) {
+    tries++;
+    const q = genFn();
+    const key = JSON.stringify(q);
+    if (!seen.has(key)) { seen.add(key); qs.push(q); }
+  }
+  return qs;
+}
+
 function generateNumbers() {
-  const type = document.getElementById('num-type').value;
-  const max = parseInt(document.getElementById('num-max').value);
-  const count = parseInt(document.getElementById('num-count').value);
+  const type = document.getElementById('num-type') ? document.getElementById('num-type').value : 'add';
+  const maxEl = document.getElementById('num-max');
+  const max = maxEl ? parseInt(maxEl.value) : 10;
+  const countEl = document.getElementById('num-count');
+  const count = countEl ? parseInt(countEl.value) : 8;
+  const ttEl = document.getElementById('times-table');
+  const ttVal = ttEl ? parseInt(ttEl.value) : 2;
   let html = '';
 
+  // ---- ADDITION ----
   if (type === 'add') {
-    const half = Math.max(2, Math.floor(max/2));
-    const qs = Array.from({length:count}, () => {
-      const a = Math.floor(Math.random()*half)+1;
-      const b = Math.floor(Math.random()*Math.min(half, max-a))+1;
-      return {a, b};
+    const qs = uniqueQs(count, () => {
+      const a = Math.floor(Math.random()*max)+1;
+      const b = Math.floor(Math.random()*(max-a+1));
+      return {a, b: Math.max(1,b)};
     });
+    const dinoTip = qs.some(q => q.a+q.b <= 10);
     html = `<div class="sheet-title">🦕 Dino Addition!</div>
-    <div class="sheet-sub">Add the numbers and write your answer. Count the dinos to help!</div>
+    <div class="sheet-sub">Add the numbers — use the dinos below each sum to help you count!</div>
     <div class="math-grid">` +
     qs.map(q => `<div class="math-box">
       <div class="math-q">${q.a} + ${q.b} = ___</div>
-      <div style="font-size:1rem;margin-top:6px;letter-spacing:2px">${'🦕'.repeat(Math.min(q.a,5))} <span style="color:#ccc">+</span> ${'🦖'.repeat(Math.min(q.b,5))}</div>
+      <div style="font-size:0.95rem;margin-top:5px;line-height:1.6">${'🦕'.repeat(Math.min(q.a,8))} <span style="opacity:0.4">+</span> ${'🦖'.repeat(Math.min(q.b,8))}</div>
     </div>`).join('') + `</div>`;
 
+  // ---- ADDITION MISSING NUMBER ----
+  } else if (type === 'add_missing') {
+    const qs = uniqueQs(count, () => {
+      const a = Math.floor(Math.random()*Math.floor(max/2))+1;
+      const b = Math.floor(Math.random()*Math.floor(max/2))+1;
+      const hide = Math.random() < 0.5 ? 'a' : 'b';
+      return {a, b, hide};
+    });
+    html = `<div class="sheet-title">🔍 Missing Number Addition!</div>
+    <div class="sheet-sub">What number is hiding? Fill in the blank to make each sum correct</div>
+    <div class="math-grid">` +
+    qs.map(q => {
+      const total = q.a + q.b;
+      const left  = q.hide === 'a' ? '___' : q.a;
+      const right = q.hide === 'b' ? '___' : q.b;
+      return `<div class="math-box">
+        <div class="math-q">${left} + ${right} = ${total}</div>
+        <div style="font-size:11px;color:#aaa;margin-top:4px">Find the missing number!</div>
+      </div>`;
+    }).join('') + `</div>`;
+
+  // ---- SUBTRACTION ----
   } else if (type === 'sub') {
-    const qs = Array.from({length:count}, () => {
-      const b = Math.floor(Math.random()*(max-1))+1;
-      const a = Math.min(max, b + Math.floor(Math.random()*(max-b))+1);
+    const qs = uniqueQs(count, () => {
+      const a = Math.floor(Math.random()*max)+2;
+      const b = Math.floor(Math.random()*(a-1))+1;
       return {a, b};
     });
     html = `<div class="sheet-title">🦖 Dino Subtraction!</div>
-    <div class="sheet-sub">Some dinos ran away! How many are left?</div>
+    <div class="sheet-sub">Some dinos ran away! Count what's left 🦕</div>
     <div class="math-grid">` +
     qs.map(q => `<div class="math-box">
       <div class="math-q">${q.a} − ${q.b} = ___</div>
-      <div style="font-size:11px;color:#aaa;margin-top:5px">${q.a} dinos, ${q.b} run away...</div>
+      <div style="font-size:11px;color:#aaa;margin-top:5px">${q.a} dinos, ${q.b} ran away...</div>
     </div>`).join('') + `</div>`;
 
+  // ---- SUBTRACTION MISSING NUMBER ----
+  } else if (type === 'sub_missing') {
+    const qs = uniqueQs(count, () => {
+      const a = Math.floor(Math.random()*max)+2;
+      const b = Math.floor(Math.random()*(a-1))+1;
+      const ans = a - b;
+      const hide = Math.random() < 0.33 ? 'a' : (Math.random() < 0.5 ? 'b' : 'ans');
+      return {a, b, ans, hide};
+    });
+    html = `<div class="sheet-title">🔍 Missing Number Subtraction!</div>
+    <div class="sheet-sub">Fill in the blank to complete each subtraction</div>
+    <div class="math-grid">` +
+    qs.map(q => {
+      const A = q.hide==='a' ? '___' : q.a;
+      const B = q.hide==='b' ? '___' : q.b;
+      const C = q.hide==='ans' ? '___' : q.ans;
+      return `<div class="math-box"><div class="math-q">${A} − ${B} = ${C}</div></div>`;
+    }).join('') + `</div>`;
+
+  // ---- TIMES TABLE SINGLE ----
+  } else if (type === 'times_single') {
+    // Fully random order, no repeats, 1×n through 10×n
+    const allMults = Array.from({length:10},(_,i)=>i+1).sort(()=>Math.random()-0.5).slice(0,count);
+    // randomise question format: a×b or b×a or missing answer or missing factor
+    html = `<div class="sheet-title">✖️ The ${ttVal} Times Table!</div>
+    <div class="sheet-sub">Practise the ${ttVal}× table — all in a random order to keep you sharp!</div>
+    <div class="math-grid">` +
+    allMults.map(n => {
+      const fmt = Math.floor(Math.random()*3);
+      if (fmt === 0) return `<div class="math-box"><div class="math-q">${ttVal} × ${n} = ___</div></div>`;
+      if (fmt === 1) return `<div class="math-box"><div class="math-q">${n} × ${ttVal} = ___</div></div>`;
+      return `<div class="math-box"><div class="math-q">${ttVal} × ___ = ${ttVal*n}</div><div style="font-size:11px;color:#aaa;margin-top:4px">What goes in the blank?</div></div>`;
+    }).join('') + `</div>
+    <div style="margin-top:12px;padding:8px 12px;background:#EAF3DE;border-radius:10px;font-size:12px;color:#3B6D11;font-weight:600">
+      🦕 Tip: ${ttVal} × 1 = ${ttVal}, ${ttVal} × 2 = ${ttVal*2}, ${ttVal} × 5 = ${ttVal*5}, ${ttVal} × 10 = ${ttVal*10}
+    </div>`;
+
+  // ---- TIMES TABLE MIXED ----
+  } else if (type === 'times_mixed') {
+    const tables = [2,3,4,5,6];
+    const qs = uniqueQs(count, () => {
+      const t = tables[Math.floor(Math.random()*tables.length)];
+      const n = Math.floor(Math.random()*10)+1;
+      const flip = Math.random() < 0.4;
+      return flip ? {a:n, b:t} : {a:t, b:n};
+    });
+    html = `<div class="sheet-title">✖️ Mixed Times Tables!</div>
+    <div class="sheet-sub">Random questions from the 2×, 3×, 4×, 5× and 6× tables — all jumbled up!</div>
+    <div class="math-grid">` +
+    qs.map(q => `<div class="math-box">
+      <div class="math-q">${q.a} × ${q.b} = ___</div>
+    </div>`).join('') + `</div>`;
+
+  // ---- TIMES TABLE GRID ----
+  } else if (type === 'times_grid') {
+    const t = ttVal;
+    html = `<div class="sheet-title">✖️ ${t}× Table Grid!</div>
+    <div class="sheet-sub">Fill in the answers — colour each box when you know it off by heart!</div>
+    <div style="margin-top:10px;overflow-x:auto">
+    <table style="border-collapse:collapse;width:100%;max-width:480px;margin:0 auto">
+      <tr style="background:#EAF3DE">
+        <th style="padding:8px 10px;font-size:13px;color:#3B6D11;border:1.5px solid #ddd;font-weight:800">Sum</th>
+        <th style="padding:8px 10px;font-size:13px;color:#3B6D11;border:1.5px solid #ddd;font-weight:800">Answer</th>
+        <th style="padding:8px 10px;font-size:13px;color:#3B6D11;border:1.5px solid #ddd;font-weight:800">Sum</th>
+        <th style="padding:8px 10px;font-size:13px;color:#3B6D11;border:1.5px solid #ddd;font-weight:800">Answer</th>
+      </tr>` +
+    Array.from({length:5},(_,i)=>{
+      const n1=i+1, n2=i+6;
+      return `<tr>
+        <td style="padding:8px 10px;border:1.5px solid #eee;font-weight:700;color:#333">${t} × ${n1}</td>
+        <td style="padding:8px 10px;border:1.5px solid #eee;border-right:3px solid #ddd"><div style="width:48px;height:26px;border-bottom:1.5px solid #bbb"></div></td>
+        <td style="padding:8px 10px;border:1.5px solid #eee;font-weight:700;color:#333">${t} × ${n2}</td>
+        <td style="padding:8px 10px;border:1.5px solid #eee"><div style="width:48px;height:26px;border-bottom:1.5px solid #bbb"></div></td>
+      </tr>`;
+    }).join('') + `</table></div>
+    <div style="margin-top:12px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center">` +
+    Array.from({length:10},(_,i)=>`<div style="padding:6px;background:#EAF3DE;border-radius:8px;font-size:12px;font-weight:700;color:#3B6D11">${t}×${i+1}<br><span style="color:#ddd;font-size:14px">___</span></div>`).join('') +
+    `</div>`;
+
+  // ---- MIXED ADD + SUB ----
+  } else if (type === 'mixed_add_sub') {
+    const qs = uniqueQs(count, () => {
+      const op = Math.random() < 0.5 ? '+' : '-';
+      if (op === '+') {
+        const a = Math.floor(Math.random()*Math.floor(max/2))+1;
+        const b = Math.floor(Math.random()*(max-a))+1;
+        return {a, b, op, ans: a+b};
+      } else {
+        const a = Math.floor(Math.random()*max)+2;
+        const b = Math.floor(Math.random()*(a-1))+1;
+        return {a, b, op, ans: a-b};
+      }
+    });
+    const ops = {'+':'➕','-':'➖'};
+    html = `<div class="sheet-title">🎲 Mixed Sums!</div>
+    <div class="sheet-sub">Addition AND subtraction all mixed up — stay sharp, dino explorer!</div>
+    <div class="math-grid">` +
+    qs.map(q => `<div class="math-box">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:1rem">${ops[q.op]}</span>
+        <div class="math-q">${q.a} ${q.op} ${q.b} = ___</div>
+      </div>
+    </div>`).join('') + `</div>`;
+
+  // ---- MIXED ALL ----
+  } else if (type === 'mixed_all') {
+    const tables = [2,3,4,5,6];
+    const qs = uniqueQs(count, () => {
+      const type3 = Math.floor(Math.random()*3);
+      if (type3 === 0) {
+        const a = Math.floor(Math.random()*Math.floor(max/2))+1;
+        const b = Math.floor(Math.random()*(max-a))+1;
+        return {display:`${a} + ${b} = ___`, tag:'+'};
+      } else if (type3 === 1) {
+        const a = Math.floor(Math.random()*max)+2;
+        const b = Math.floor(Math.random()*(a-1))+1;
+        return {display:`${a} − ${b} = ___`, tag:'-'};
+      } else {
+        const t = tables[Math.floor(Math.random()*tables.length)];
+        const n = Math.floor(Math.random()*10)+1;
+        return {display:`${t} × ${n} = ___`, tag:'×'};
+      }
+    });
+    const tagColor = {'+':'#534AB7','-':'#993C1D','×':'#3B6D11'};
+    const tagBg = {'+':'#EEEDFE','-':'#FAECE7','×':'#EAF3DE'};
+    html = `<div class="sheet-title">🌟 Mega Mixed Maths!</div>
+    <div class="sheet-sub">Addition, subtraction AND multiplication — can you get them all?</div>
+    <div class="math-grid">` +
+    qs.map(q => `<div class="math-box">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="background:${tagBg[q.tag]};color:${tagColor[q.tag]};border-radius:6px;padding:2px 8px;font-size:11px;font-weight:800">${q.tag}</span>
+        <div class="math-q" style="font-size:1.1rem">${q.display}</div>
+      </div>
+    </div>`).join('') + `</div>`;
+
+  // ---- COUNT ----
   } else if (type === 'count') {
-    const qs = Array.from({length:count}, () => Math.floor(Math.random()*max)+1);
-    const emojis = ['🦕','🦖','🥚','🦴','🌿'];
+    const countMax = Math.min(max, 12);
+    const qs = Array.from({length:count}, () => Math.floor(Math.random()*countMax)+1);
+    const emojis = ['🦕','🦖','🥚','🦴','🌿','🦷'];
     html = `<div class="sheet-title">🔢 Count the Dinos!</div>
     <div class="sheet-sub">Count each group carefully and write the number in the box</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">` +
     qs.map(n => {
       const e = emojis[Math.floor(Math.random()*emojis.length)];
       return `<div class="math-box" style="text-align:center">
-        <div style="font-size:1.3rem;line-height:1.8;min-height:52px;word-break:break-all">${e.repeat(n)}</div>
+        <div style="font-size:1.2rem;line-height:1.8;min-height:50px;word-break:break-all">${e.repeat(n)}</div>
         <div style="display:inline-block;border:2px solid #eee;border-radius:8px;width:44px;height:34px;margin-top:8px"></div>
       </div>`;
     }).join('') + `</div>`;
 
+  // ---- ORDER ----
   } else if (type === 'order') {
-    const rows = Array.from({length:Math.min(count,5)}, () => {
+    const rows = Array.from({length:Math.min(count,6)}, () => {
       const set = new Set();
       while(set.size < 5) set.add(Math.floor(Math.random()*max)+1);
       return [...set].sort(() => Math.random()-0.5);
     });
     html = `<div class="sheet-title">🦕 Number Order!</div>
-    <div class="sheet-sub">Write the numbers smallest → biggest in the boxes</div>
+    <div class="sheet-sub">Write the numbers from smallest → biggest in the answer boxes</div>
     <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px">` +
     rows.map(r => `<div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
         ${r.map(n=>`<div style="min-width:36px;height:36px;border-radius:8px;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-weight:800;color:#3B6D11;font-size:1rem;padding:0 6px">${n}</div>`).join('')}
       </div>
       <div style="display:flex;gap:6px;align-items:center">
-        <span style="font-size:11px;color:#aaa;margin-right:4px">Answer:</span>
+        <span style="font-size:11px;color:#aaa;margin-right:4px">Order:</span>
         ${r.map(()=>`<div style="min-width:36px;height:36px;border-radius:8px;border:1.5px solid #ddd"></div>`).join('')}
       </div>
     </div>`).join('') + `</div>`;
 
+  // ---- BONDS ----
   } else if (type === 'bonds') {
-    const target = Math.min(max, 10);
-    const qs = Array.from({length:count}, () => {
+    const bondTargets = [5,6,7,8,9,10,20];
+    const target = bondTargets[Math.floor(Math.random()*Math.min(bondTargets.length, max<=10?6:7))];
+    const qs = uniqueQs(count, () => {
       const a = Math.floor(Math.random()*(target+1));
-      return {a, b:target-a, target};
+      return {a, b:target-a};
     });
     html = `<div class="sheet-title">💚 Number Bonds to ${target}!</div>
     <div class="sheet-sub">Fill in the missing number so each pair adds up to ${target}</div>
     <div class="math-grid">` +
-    qs.map(q => `<div class="math-box">
-      <div class="math-q">${q.a} + ___ = ${q.target}</div>
-    </div>`).join('') + `</div>`;
+    qs.map(q => {
+      const hideFirst = Math.random() < 0.5;
+      return `<div class="math-box">
+        <div class="math-q">${hideFirst?'___':q.a} + ${hideFirst?q.b:'___'} = ${target}</div>
+      </div>`;
+    }).join('') + `</div>`;
 
+  // ---- BIGGER / SMALLER ----
   } else {
-    // bigger or smaller
-    const qs = Array.from({length:count}, () => {
+    const qs = uniqueQs(count, () => {
       const a = Math.floor(Math.random()*max)+1;
       let b = Math.floor(Math.random()*max)+1;
       while(b === a) b = Math.floor(Math.random()*max)+1;
       return {a, b};
     });
     html = `<div class="sheet-title">🦖 Bigger or Smaller?</div>
-    <div class="sheet-sub">Write &gt; (bigger) or &lt; (smaller) in the middle box</div>
+    <div class="sheet-sub">Write &gt; (bigger than) or &lt; (smaller than) in the middle box</div>
     <div class="math-grid">` +
     qs.map(q => `<div class="math-box" style="display:flex;align-items:center;gap:10px">
-      <div style="font-size:1.3rem;font-weight:800;color:#3B6D11;min-width:28px;text-align:center">${q.a}</div>
-      <div style="width:32px;height:32px;border:2px solid #ddd;border-radius:8px"></div>
-      <div style="font-size:1.3rem;font-weight:800;color:#3B6D11;min-width:28px;text-align:center">${q.b}</div>
+      <div style="font-size:1.3rem;font-weight:800;color:#3B6D11;min-width:32px;text-align:center">${q.a}</div>
+      <div style="width:36px;height:36px;border:2px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#ccc">?</div>
+      <div style="font-size:1.3rem;font-weight:800;color:#3B6D11;min-width:32px;text-align:center">${q.b}</div>
     </div>`).join('') + `</div>`;
   }
 
