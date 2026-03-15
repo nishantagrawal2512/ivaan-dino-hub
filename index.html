@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🦕 Dino Learning Hub</title>
+<title>🦕 Ivaan's Dino Learning Hub</title>
 <style>
 /* ===== GOOGLE FONTS FALLBACK + SYSTEM ===== */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
@@ -318,7 +318,7 @@ select:focus { border-color: var(--green); }
 
 <!-- HEADER -->
 <header class="site-header">
-  <h1>🦕 Dino Learning Hub</h1>
+  <h1>🦕 Ivaan's Dino Learning Hub</h1>
   <p>Fun printable activities for curious young explorers!</p>
   <div class="dino-strip">🦕 🦖 🦕 🦖 🦕</div>
 </header>
@@ -340,7 +340,7 @@ select:focus { border-color: var(--green); }
 
 <!-- FOOTER -->
 <footer class="site-footer">
-  Made with 💚 for a curious little dino explorer &nbsp;|&nbsp; Print any sheet using the 🖨 button
+  Made with 💚 for Ivaan — a curious little dino explorer &nbsp;|&nbsp; Print any sheet using the 🖨 button
 </footer>
 
 <script>
@@ -573,6 +573,10 @@ function buildNumbersUI() {
           <option value="8" selected>8 questions</option>
           <option value="12">12 questions</option>
           <option value="16">16 questions</option>
+          <option value="20">20 questions</option>
+          <option value="24">24 questions</option>
+          <option value="30">30 questions</option>
+          <option value="36">36 questions</option>
         </select>
       </div>
     </div>
@@ -1284,39 +1288,131 @@ function printSheet(previewId) {
     return;
   }
   const content = preview.innerHTML;
+  const today = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'});
   const w = window.open('', '_blank');
   w.document.write(`<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dino Activity Sheet</title>
+<title>Ivaan's Dino Activity Sheet</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
-:root{--green:#3B6D11;--amber:#BA7517;--coral:#993C1D;--purple:#534AB7;}
+:root{--green:#3B6D11;--green-light:#EAF3DE;--amber:#BA7517;--coral:#993C1D;--purple:#534AB7;}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Nunito','Segoe UI',sans-serif;padding:24px 28px;max-width:680px;margin:0 auto;background:white;color:#1a2212}
-.sheet-title{font-family:'Fredoka One',cursive;font-size:1.6rem;color:#3B6D11;text-align:center;margin-bottom:4px}
-.sheet-sub{font-size:13px;color:#888;text-align:center;margin-bottom:1rem}
-.trace-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.trace-box{border:1.5px solid #ddd;border-radius:10px;padding:10px 8px;text-align:center}
-.big-letter{font-size:2.8rem;font-weight:800;color:#e8e8e8;font-family:'Fredoka One',cursive;line-height:1}
-.trace-line{border-bottom:1.5px dashed #ccc;height:34px;margin-top:6px}
-.math-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.math-box{border:1.5px solid #eee;border-radius:10px;padding:10px 14px}
-.math-q{font-size:1.2rem;font-weight:800;color:#3B6D11}
-.ans-line{border-bottom:1.5px solid #ddd;width:48px;height:26px;margin-top:6px}
+body{font-family:'Nunito','Segoe UI',sans-serif;background:white;color:#1a2212;padding:0}
+
+/* ===== PRINT HEADER ===== */
+.print-header{
+  background:linear-gradient(135deg,#2d5a0e 0%,#3B6D11 55%,#4a8a15 100%);
+  padding:14px 24px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:4px solid #2d5a0e;
+}
+.print-header-left{display:flex;align-items:center;gap:12px}
+.print-header-dinos{font-size:1.6rem;opacity:0.7;letter-spacing:4px}
+.print-header-title{font-family:'Fredoka One',cursive;font-size:1.6rem;color:white;letter-spacing:1px;text-shadow:0 1px 4px rgba(0,0,0,0.25)}
+.print-header-sub{font-size:12px;color:rgba(255,255,255,0.8);font-weight:600;margin-top:1px}
+.print-header-right{text-align:right}
+.print-date{font-size:11px;color:rgba(255,255,255,0.7);font-weight:600}
+.print-name-box{margin-top:4px;border:1.5px solid rgba(255,255,255,0.4);border-radius:8px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;min-width:120px;text-align:center}
+
+/* ===== CONTENT ===== */
+.print-body{padding:16px 20px 12px}
+.sheet-title{font-family:'Fredoka One',cursive;font-size:1.35rem;color:#3B6D11;text-align:center;margin-bottom:3px}
+.sheet-sub{font-size:12px;color:#888;text-align:center;margin-bottom:12px}
+
+/* ===== GRIDS — compact for A4 ===== */
+.math-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.math-grid.cols3{grid-template-columns:1fr 1fr 1fr}
+.math-grid.cols4{grid-template-columns:1fr 1fr 1fr 1fr}
+.math-box{border:1.5px solid #e0e0e0;border-radius:8px;padding:7px 10px;background:white}
+.math-q{font-size:1.05rem;font-weight:800;color:#3B6D11}
+.ans-line{border-bottom:1.5px solid #ddd;width:44px;height:22px;margin-top:4px}
+.trace-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.trace-box{border:1.5px solid #ddd;border-radius:8px;padding:8px 6px;text-align:center}
+.big-letter{font-size:2.2rem;font-weight:800;color:#e8e8e8;font-family:'Fredoka One',cursive;line-height:1}
+.trace-line{border-bottom:1.5px dashed #ccc;height:28px;margin-top:5px}
+
+/* ===== PRINT FOOTER ===== */
+.print-footer{
+  margin-top:10px;
+  border-top:1.5px solid #e0e0e0;
+  padding:8px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:10px;color:#aaa;
+}
+.print-footer-stars{letter-spacing:2px;font-size:14px}
+.score-box{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#888}
+.score-field{display:inline-block;border-bottom:1.5px solid #bbb;width:36px;height:18px}
+
 .placeholder{display:none}
+
+/* ===== RESPONSIVE GRID FOR LARGE QUESTION COUNTS ===== */
+/* applied by JS after render */
 @media print{
-  body{padding:10px}
-  @page{margin:10mm;size:A4}
+  body{padding:0}
+  @page{margin:8mm;size:A4}
+  .print-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
 </head>
-<body>${content}</body>
+<body>
+
+<div class="print-header">
+  <div class="print-header-left">
+    <div class="print-header-dinos">🦕🦖🦕</div>
+    <div>
+      <div class="print-header-title">Ivaan's Dino Learning Hub</div>
+      <div class="print-header-sub">Fun maths for a dino explorer!</div>
+    </div>
+  </div>
+  <div class="print-header-right">
+    <div class="print-date">${today}</div>
+    <div class="print-name-box">Score: _____ / _____</div>
+  </div>
+</div>
+
+<div class="print-body" id="print-body">
+${content}
+</div>
+
+<div class="print-footer">
+  <div>🦕 Keep going, Ivaan — you're doing amazing! 🦕</div>
+  <div class="score-field-row" style="display:flex;align-items:center;gap:6px;font-size:11px;color:#aaa">
+    <span>Time taken:</span>
+    <span style="border-bottom:1px solid #ccc;display:inline-block;width:60px;height:16px"></span>
+    <span>mins</span>
+  </div>
+</div>
+
+<script>
+// Auto-pick a tighter grid based on question count
+(function(){
+  const boxes = document.querySelectorAll('.math-box');
+  const n = boxes.length;
+  const grid = document.querySelector('.math-grid');
+  if (!grid) return;
+  if (n >= 24) {
+    grid.classList.add('cols3');
+    grid.style.gap = '5px';
+    document.querySelectorAll('.math-q').forEach(el => el.style.fontSize = '0.95rem');
+    document.querySelectorAll('.math-box').forEach(el => { el.style.padding = '5px 8px'; });
+  }
+  if (n >= 30) {
+    grid.classList.remove('cols3');
+    grid.classList.add('cols4');
+    grid.style.gap = '4px';
+    document.querySelectorAll('.math-q').forEach(el => el.style.fontSize = '0.88rem');
+    document.querySelectorAll('.math-box').forEach(el => { el.style.padding = '5px 7px'; });
+  }
+})();
+<\/script>
+
+</body>
 </html>`);
   w.document.close();
   w.focus();
-  setTimeout(() => { w.print(); }, 700);
+  setTimeout(() => { w.print(); }, 800);
 }
 
 // =====================================================
